@@ -13,3 +13,10 @@ After running images through RABIES, one can further analyze motion and network-
     *   Winkler AM, Ridgway GR, Webster MA, Smith SM, Nichols TE. Permutation inference for the general linear model. NeuroImage, 2014;92:381-397
   * rabies_dice_method.py - Calculates the Dice Similarity Coefficient (DSC) between a group network and the corresponding prior network.
   * amplitude_correlations.py - Calculates the amplitude correspondence between a group network and the corresponding prior network.
+
+#### RABIES Resources
+* Publication:
+   *  Desrosiers-Gregoire, G., Devenyi, G. A., Grandjean, J. & Chakravarty, M. M. Rodent Automated Bold Improvement of EPI Sequences (RABIES): A standardized image processing and data quality platform for rodent fMRI. Biorxiv 2022.08.20.504597 (2022) doi:10.1101/2022.08.20.504597.
+* Documentation:
+   *  https://rabies.readthedocs.io/en/latest/
+
