@@ -9,9 +9,11 @@ clear variables
 
 %% Read in motionparam files
 
+%% USER INPUT
 % Path to RABIES-generated FD_csv file:
-FD_csv_path = '/Volumes/menon_data$/slaxer/data/ds-NonInvasiveImg/derivatives/rabies_NoninvasiveAndHeadpost/FromAllianceCan/preproc6_robust/motion_datasink/FD_csv';
+FD_csv_path = <path-to-preproc-folder> + '/motion_datasink/FD_csv';
 
+%%
 % Find all FD_csv files
 FD_csv_files = fileSkimmer(FD_csv_path, {}, '.csv');
 
