@@ -7,11 +7,15 @@
 close all
 clear variables
 
+
 %% Read in motionparam files
 
 %% USER INPUT
-% Path to RABIES-generated FD_csv file:
-FD_csv_path = <path-to-preproc-folder> + '/motion_datasink/FD_csv';
+% Path to RABIES-generated FD_csv files:
+% This would be located in the RABIES preproc output folder as follows:
+% <path-to-preproc-folder>/motion_datasink/FD_csv
+%FD_csv_path = <path-to-preproc-folder> + '/motion_datasink/FD_csv';
+FD_csv_path = '';
 
 %%
 % Find all FD_csv files

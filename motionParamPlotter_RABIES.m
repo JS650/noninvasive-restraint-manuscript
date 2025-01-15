@@ -7,6 +7,15 @@
 % fileLocation can point to EITHER a FD file or a motion parameter file 
 % (both are csv files).
 %
+% If the inputTR (repetition time) is not included, it defaults to 1.5
+% seconds.
+%
+% From the RABIES preproc folder, the motionparam/FD files (fileLocation)
+% can be found:
+%   motionparams files:  <preproc-dir>/motion_datasink/motion_params_csv
+%   FD files:            <preproc-dir>/motion_datasink/FD_csv
+%   
+%
 % Sam Laxer on June 19, 2024
 
 
