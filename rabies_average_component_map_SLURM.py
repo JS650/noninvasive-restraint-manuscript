@@ -159,86 +159,57 @@ def file_grouper(run_dict, group_dict, out_dir):
     print('DONE copying files into groups in ' + out_dir)
 
 
-def file_copyer_and_group_map(analysis_dir, group, time):
+def file_copyer_and_group_map(group_dir):
     '''
     Put everything together into function to allow for parallel processing (below).
     '''
-    #%% Sort data into groups (if applicable)
-    sorting_file = analysis_dir + f'/{group}/{time}/rand_samples_{group}_{time}.csv'
-    sorting_data = csvread(sorting_file)
-    sorted_dict = group_dict_maker(sorting_data)
-    #print(sorted_dict)
 
-    #%% Copy files to directories according to their respective groups
-    out_dir = os.path.dirname(sorting_file)
-    file_grouper(run_dict, sorted_dict, out_dir)
+    # Keep track of which folder we are on (print to console for progress update)
 
-    #%% Get all folder names containing each group that we want to find average component of
-    grouped_nii_files = fileskimmer(out_dir, 'repeats.nii.gz')
-    # Get a list with each of the parent directories for each file
-    mydirs = []
-    for file in grouped_nii_files:
-        mydirs.append(os.path.dirname(file))
+    # Set up output filenames and output folders before computing average component map and statistics
+    outdir = group_dir
+    
+    ## Based on user input:
+    mydir_bottomdirname = os.path.basename(os.path.normpath(group_dir))
+    mergedname = 'merged_somatomotor_' + mydir_bottomdirname
+    avgname = mergedname + '_Tmean'
+    statsname = '_1sampleGroupMean'
+    uncorrpmaps_suffix = '_vox_p_tstat1'
+    ptoz_suffix = '_ptoz'
+    ext = '.nii'
 
-    count = 1
-    for mydir in mydirs:
-        # Keep track of which folder we are on (print to console for progress update)
-        print('File ' + str(count) + ' of ' + str(len(mydirs)))
-        count = count + 1
+    # Create paths
+    mergedpath = outdir + os.path.sep + mergedname + ext
+    avgfilepath = outdir + os.path.sep + avgname + '.nii.gz'
+    zmap_path = outdir + os.path.sep + mergedname + statsname + uncorrpmaps_suffix + ptoz_suffix + ext
 
-        # Set up output filenames and output folders before computing average component map and statistics
-        outdir = mydir
-        ## Based on user input:
-        mydir_bottomdirname = os.path.basename(os.path.normpath(mydir))
-        mergedname = 'merged_somatomotor_' + mydir_bottomdirname
-        avgname = mergedname + '_Tmean'
-        statsname = '_1sampleGroupMean'
-        uncorrpmaps_suffix = '_vox_p_tstat1'
-        ptoz_suffix = '_ptoz'
-        ext = '.nii'
+    # Get string of all images in directory
+    files = fileskimmer(group_dir, 'repeats.nii.gz')
+    filestr = ' '.join(files)
 
-        # Create paths
-        mergedpath = outdir + os.path.sep + mergedname + ext
-        avgfilepath = outdir + os.path.sep + avgname + '.nii.gz'
-        zmap_path = outdir + os.path.sep + mergedname + statsname + uncorrpmaps_suffix + ptoz_suffix + ext
+    # Merge images
+    if not os.path.exists(mergedpath): # Make sure file does not already exist
+        # Prior components: 5 = Somatomotor, 12 = Visual, 19 = DMN
+        os.system('fslmerge -n 5 ' + mergedpath + ' ' + filestr)
+        os.system('gunzip ' + mergedpath + '.gz')
 
-        # Get string of all images in directory
-        files = fileskimmer(mydir, 'repeats.nii.gz')
-        filestr = ' '.join(files)
+    # Average the merged image *** as done in RABIES:
+    if not os.path.exists(avgfilepath): # Make sure file does not already exist
+        os.system('fslmaths ' + mergedpath + ' -Tmean ' + avgfilepath)
 
-        # Merge images
-        if not os.path.exists(mergedpath): # Make sure file does not already exist
-            # Prior components: 5 = Somatomotor, 12 = Visual, 19 = DMN
-            os.system('fslmerge -n 5 ' + mergedpath + ' ' + filestr)
-            os.system('gunzip ' + mergedpath + '.gz')
-
-        # Average the merged image *** as done in RABIES:
-        if not os.path.exists(avgfilepath): # Make sure file does not already exist
-            os.system('fslmaths ' + mergedpath + ' -Tmean ' + avgfilepath)
-
-        # Get 1-sample t-test group average maps and convert to z-scores
-        if not os.path.exists(zmap_path): # Make sure file does not already exist
-            os.system('palm -i ' + mergedpath + ' -o ' + mydir + os.path.sep + mergedname + statsname + ' -zstat -n 5000')
+    # Get 1-sample t-test group average maps and convert to z-scores
+    if not os.path.exists(zmap_path): # Make sure file does not already exist
+        os.system('palm -i ' + mergedpath + ' -o ' + group_dir + os.path.sep + mergedname + statsname + ' -zstat -n 5000')
     
 
 if __name__ == "__main__":
     #%% Get all files and organize in sub > ses > run: ### dictionary
 
-    # Specify directory containing dual-regression files:
-    dr_dir = '<full-path-to-analysis-dir>/<analysis-dir>/analysis_datasink/dual_regression_nii'
-    # Sift through dr_dir directory and save all filenames to list:
-    nii_files = fileskimmer(dr_dir, 'maps.nii.gz')
-    # Organize list of files into dictionary in form: sub > ses > run: ###
-    run_dict = csv_organizer(nii_files)
-
     # The SLURM file used to run this script should contain - in JSON format - 
     # the paths to all directories you wish to generate group maps of using
     # PALM.
-    input_json = json.loads(sys.argv[1])
-    analysis_dir = input_json["analysis_dir"]
-    group = input_json["group"]
-    time = input_json["time"]
+    group_dir = sys.argv[1]
     # Specify directory holding csv files for sorting and where groups maps should be stored:
-    results = file_copyer_and_group_map(analysis_dir, group, time)
+    results = file_copyer_and_group_map(group_dir)
     print("Results:", results)
 
