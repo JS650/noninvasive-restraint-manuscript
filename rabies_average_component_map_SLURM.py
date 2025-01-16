@@ -1,5 +1,4 @@
 import os, os.path
-from typing import List
 import sys
 import glob
 
