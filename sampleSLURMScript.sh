@@ -11,14 +11,9 @@ module load fsl/6.0.4
 module load octave/5.2.0
 PATH=$PATH:~/dev/palm-alpha119
 
+# Enter all directories holding dual-regression files to be analyzed by PALM:
 inputs=(
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "30min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "60min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "90min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "120min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "150min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "180min"}'
-'{"analysis_dir": "/scratch/r/rmenon/jlaxer2/python_work", "group": "motionGroup5", "time": "210min"}'
+" "
 )
 
 # Select the inputs for this array job
