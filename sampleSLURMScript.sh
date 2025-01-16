@@ -1,5 +1,7 @@
 #!/bin/bash
 #SBATCH --time=00-0:01:00 # DD-HH:MM:SS#SBATCH
+#SBATCH --array=0-2 # Change this range to 0 - <number of directories in 'inputs' minus 1>
+# -- Likely need more SBATCH commands (i.e., specify memory/cores/email notification/etc)
 
 # Load modules
 module load python/3.8
