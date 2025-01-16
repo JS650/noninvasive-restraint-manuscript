@@ -21,4 +21,5 @@ inputs=(
 # Select the inputs for this array job
 input="${inputs[$SLURM_ARRAY_TASK_ID]}"
 
-python /home/r/rmenon/jlaxer2/dev/rabies_extensions/rabies_average_component_map_SLURM.py "$input"
+# Change to path of rabies_average_component_map_SLURM.py script
+python <path-to-script>/rabies_average_component_map_SLURM.py "$input"
