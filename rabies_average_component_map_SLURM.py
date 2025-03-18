@@ -31,7 +31,9 @@ def file_copyer_and_group_map(group_dir):
     '''
     Put everything together into function to allow for parallel processing (below).
     '''
-
+    # Prior components: 5 = Somatomotor, 12 = Visual, 19 = DMN  ;  If not dealing with RABIES ICA maps, can still just use 0 or whichever component needed
+    component = 0
+    
     # Keep track of which folder we are on (print to console for progress update)
 
     # Set up output filenames and output folders before computing average component map and statistics
@@ -39,7 +41,18 @@ def file_copyer_and_group_map(group_dir):
     
     ## Based on user input:
     mydir_bottomdirname = os.path.basename(os.path.normpath(group_dir))
-    mergedname = 'merged_somatomotor_' + mydir_bottomdirname
+    # Prior components: 5 = Somatomotor, 12 = Visual, 19 = DMN
+    if component == 5:
+        mergedname = 'merged_somatomotor_' + mydir_bottomdirname
+    elif component == 12:
+        mergedname = 'merged_visual_' + mydir_bottomdirname
+    elif component == 19:
+        mergedname = 'merged_DMN_' + mydir_bottomdirname
+    elif component == 0:
+        mergedname = 'merged_' + mydir_bottomdirname
+    else:
+        ValueError('UNKNOWN COMPONENT! Check code to make sure correct component is being merged.')
+
     avgname = mergedname + '_Tmean'
     statsname = '_1sampleGroupMean'
     uncorrpmaps_suffix = '_vox_p_tstat1'
@@ -52,13 +65,25 @@ def file_copyer_and_group_map(group_dir):
     zmap_path = outdir + os.path.sep + mergedname + statsname + uncorrpmaps_suffix + ptoz_suffix + ext
 
     # Get string of all images in directory
-    files = fileskimmer(group_dir, 'repeats.nii.gz')
+    #files = fileskimmer(group_dir, 'maps.nii.gz')
+    files = fileskimmer(group_dir, 'map.nii.gz')
+    #files = fileskimmer(group_dir, 'repeats.nii.gz')
     filestr = ' '.join(files)
-
+    
     # Merge images
     if not os.path.exists(mergedpath): # Make sure file does not already exist
         # Prior components: 5 = Somatomotor, 12 = Visual, 19 = DMN
-        os.system('fslmerge -n 5 ' + mergedpath + ' ' + filestr)
+        if component == 5:
+            print('Merging all SOMATOMOTOR networks.')
+        elif component == 12:
+            print('Merging all VISUAL networks.')
+        elif component == 19:
+            print('Merging all DMN networks.')
+        elif component == 0:
+            print('Merging all networks.')
+        else:
+            print('UNKNOWN COMPONENT! Check code to make sure correct component is being merged.')
+        os.system('fslmerge -n ' + str(component) + ' ' + mergedpath + ' ' + filestr)
         os.system('gunzip ' + mergedpath + '.gz')
 
     # Average the merged image *** as done in RABIES:
@@ -68,7 +93,7 @@ def file_copyer_and_group_map(group_dir):
     # Get 1-sample t-test group average maps and convert to z-scores
     if not os.path.exists(zmap_path): # Make sure file does not already exist
         os.system('palm -i ' + mergedpath + ' -o ' + group_dir + os.path.sep + mergedname + statsname + ' -zstat -n 5000')
-    
+
 
 if __name__ == "__main__":
     #%% Get all files and organize in sub > ses > run: ### dictionary
